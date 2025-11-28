@@ -1,52 +1,62 @@
 body {
-  font-family: "Noto Sans TC", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f5f5f5;
+  font-family: "Noto Sans TC", system-ui, sans-serif;
+  background: #f3f3f3;
   margin: 0;
 }
 
 .container {
   max-width: 480px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 20px;
+}
+
+.username {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.green-name {
+  color: #06C755;
+  font-weight: 900;
 }
 
 h2 {
   font-size: 20px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  padding-left: 2px;
+  border-left: 5px solid #06C755;
 }
 
 .field-group {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .field-group label {
   display: block;
-  font-size: 14px;
-  color: #000;          /* 黑色 */
-  font-weight: 700;     /* 加粗 */
-  margin-bottom: 4px;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 6px;
 }
 
-/* 「必填」紅色 */
 .label-required {
-  color: #d32f2f;       /* 紅色 */
-  font-weight: 400;     /* 不用再加粗也可，看你喜好 */
-  margin-left: 2px;
+  color: #d32f2f;
+  font-weight: 700;
 }
 
 .field-group input,
 .field-group select,
 .field-group textarea {
   width: 100%;
-  border: 1px solid #ddd;
+  border: 1px solid #ccc;
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 16px;
-  box-sizing: border-box;
   background: #fff;
+  box-sizing: border-box;
 }
 
-/* 日期欄位右邊小圖示 */
+/* 日期圖示 */
 .date-group {
   position: relative;
 }
@@ -60,14 +70,27 @@ h2 {
   font-size: 18px;
 }
 
-/* 送出按鈕：LINE 綠 */
+.hint {
+  font-size: 12px;
+  color: #777;
+  margin-top: 4px;
+}
+
+/* 按鈕 */
 button[type="submit"] {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   border: none;
-  border-radius: 8px;
-  background: #06C755;   /* LINE 綠 */
+  border-radius: 10px;
+  background: #06C755;
   color: #fff;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-top: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+button[type="submit"]:active {
+  transform: scale(0.98);
 }
