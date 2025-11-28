@@ -89,6 +89,7 @@
         小孩人數 <span class="label-required">（必填）</span>
       </label>
       <select id="child" required>
+        <option value="" disabled selected>請選擇</option>
           <script>
           document.write(
             Array.from({length: 10}, (_, i) => i + 1)
@@ -103,7 +104,7 @@
     <div class="field-group">
       <label>兒童坐椅</label>
       <select id="chair">
-        <option value="無" selected>無</option>
+       <option value="" disabled selected>請選擇</option>
         <script>
           document.write(
             Array.from({length: 5}, (_, i) => i + 1)
