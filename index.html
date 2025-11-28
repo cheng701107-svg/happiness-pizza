@@ -2,18 +2,17 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>LINE 預訂表單</title>
+<title>LINE 預約表單</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- LIFF -->
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
-<!-- 日期套件 flatpickr（彈出月曆） -->
+<!-- 日期 flatpickr -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh-tw.js"></script>
 
-<!-- 外部 CSS -->
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -24,86 +23,66 @@
 
   <form id="liffForm">
 
-    <!-- 隱藏：UID / EMAIL -->
+    <!-- 隱藏：LINE UID / email / name -->
     <input type="hidden" id="line_uid">
     <input type="hidden" id="line_email">
+    <input type="hidden" id="name">
 
-    <!-- 姓名（自動帶 LINE 名稱，可修改） -->
+    <!-- 顯示姓名但不可編輯 -->
     <div class="field-group">
-      <label>姓名</label>
-      <input type="text" id="name" placeholder="請輸入姓名">
+      <label>姓名（自動帶入）</label>
+      <input type="text" id="name_display" disabled>
     </div>
 
-
-    <!-- 館別 -->
+    <!-- 手機 -->
     <div class="field-group">
-      <label>包棟館別</label>
-      <select id="house">
-        <option disabled selected>請選擇</option>
-        <option value="A棟">A棟</option>
-        <option value="B棟">B棟</option>
-        <option value="皆可">皆可</option>
-      </select>
+      <label>手機（必填）</label>
+      <input
+        type="tel"
+        id="phone"
+        required
+        placeholder="0912345678"
+        maxlength="10"
+        pattern="09[0-9]{8}"
+        inputmode="numeric"
+      >
     </div>
 
-    <!-- 日期：彈出式月曆 -->
+    <!-- 預約日期 -->
     <div class="field-group date-group">
-  <label>
-    <span class="label-title">包棟日期</span>
-    <span class="label-required">（必填）</span>
-  </label>
-  <input
-    type="text"
-    id="date"
-    required
-    placeholder="請選擇日期"
-    readonly
-  >
-  <span class="date-icon">📅</span>
-</div>
+      <label>
+        <span class="label-title">預約日期</span>
+        <span class="label-required">（必填）</span>
+      </label>
+      <input
+        type="text"
+        id="date"
+        required
+        placeholder="請選擇日期"
+        readonly
+      >
+      <span class="date-icon">📅</span>
+    </div>
 
-
-    <!-- 天數 -->
+    <!-- 預約時段 -->
     <div class="field-group">
-      <label>包棟天數</label>
-      <select id="days">
-        <option disabled selected>請選擇</option>
-        <option value="1">1 晚</option>
-        <option value="2">2 晚</option>
-        <option value="3">3 晚</option>
+      <label>預約時段（必填）</label>
+      <select id="time" required>
+        <option disabled selected value="">請選擇</option>
+        <option>11:30</option>
+        <option>13:30</option>
+        <option>15:30</option>
       </select>
     </div>
 
-    
-      <div class="field-group">
-       <label>
-    <span class="label-title">大人人數</span>
-    <span class="label-required">（必填）</span>
-  </label>
+    <!-- 大人 -->
+    <div class="field-group">
+      <label>大人人數（必填）</label>
       <select id="adult" required>
         <option value="" disabled selected>請選擇</option>
-        <!-- 自動生成 6–34 -->
         <script>
           document.write(
-            Array.from({length: 29}, (_, i) => i + 6)
-            .map(n => `<option value="${n}">${n} 位</option>`)
-            .join("")
-          );
-        </script>
-      </select>
-    </div>
-
-    <!-- 小孩 -->
-     <div class="field-group">
-      <label>
-    <span class="label-title">小孩人數</span>
-    <span class="label-required">（必填）</span>
-  </label>
-      <select id="child" required>
-        <option value="" disabled selected>請選擇</option>
-        <script>
-          document.write(
-            Array.from({length: 11}, (_, i) => i)
+            Array.from({length: 30}, (_, i) => i + 1)
               .map(n => `<option value="${n}">${n} 位</option>`)
               .join("")
           );
@@ -111,17 +90,40 @@
       </select>
     </div>
 
-
-    <!-- 寵物 -->
+    <!-- 小孩 -->
     <div class="field-group">
-      <label>寵物</label>
-      <input type="text" id="pet" placeholder="例如：1隻小狗…">
+      <label>小孩人數（必填）</label>
+      <select id="child" required>
+        <option value="0">無</option>
+        <script>
+          document.write(
+            Array.from({length: 10}, (_, i) => i + 1)
+              .map(n => `<option value="${n}">${n} 位</option>`)
+              .join("")
+          );
+        </script>
+      </select>
+    </div>
+
+    <!-- 兒童坐椅 -->
+    <div class="field-group">
+      <label>兒童坐椅</label>
+      <select id="chair">
+        <option value="0">無</option>
+        <script>
+          document.write(
+            Array.from({length: 5}, (_, i) => i + 1)
+              .map(n => `<option value="${n}">${n} 張</option>`)
+              .join("")
+          );
+        </script>
+      </select>
     </div>
 
     <!-- 備註 -->
     <div class="field-group">
-      <label>需求內容</label>
-      <textarea id="note" rows="3" placeholder="可填寫備註、特殊需求…"></textarea>
+      <label>備註</label>
+      <textarea id="note" rows="3" placeholder="可填寫特殊需求…"></textarea>
     </div>
 
     <button type="submit">送出資料</button>
@@ -129,10 +131,11 @@
   </form>
 </div>
 
+
 <script>
-/* =======================================
-   🔰 LIFF 初始化（抓 UID / Email / 姓名）
-======================================= */
+/* =======================
+   LIFF 初始化
+======================= */
 async function initLIFF() {
   await liff.init({ liffId: "2008409020-k4Oy7Y0D" });
 
@@ -141,72 +144,80 @@ async function initLIFF() {
     return;
   }
 
-  // 取得使用者基本資料（只呼叫一次）
   const profile = await liff.getProfile();
+
   document.getElementById("line_uid").value = profile.userId;
 
-  // 自動帶入 LINE 顯示名稱
-  const nameInput = document.getElementById("name");
-  if (nameInput && !nameInput.value) {
-    nameInput.value = profile.displayName || "";
-  }
+  document.getElementById("name").value = profile.displayName;
+  document.getElementById("name_display").value = profile.displayName;
 
-  // 取得 email（需在 LINE Developers 開通 email 權限）
   const token = liff.getDecodedIDToken();
-  const email = token ? token.email : null;
-
-  console.log("=== DEBUG ===");
-  console.log("UID:", profile.userId);
-  console.log("DisplayName:", profile.displayName);
-  console.log("Email:", email);
-
-  document.getElementById("line_email").value = email || "";
+  document.getElementById("line_email").value = token?.email || "";
 }
 
-/* =======================================
-   📅 初始化日期選擇器 flatpickr
-======================================= */
+
+/* ===========================
+   日期：只允許週六、週日、假日
+=========================== */
+const holidays = [
+  "2025-01-01",
+  "2025-02-28",
+  "2025-04-04",
+  "2025-05-01",
+  "2025-06-09",
+  "2025-09-17",
+  "2025-10-10"
+];
+
 function initDatePicker() {
   flatpickr("#date", {
     locale: "zh_tw",
     dateFormat: "Y-m-d",
-    minDate: "today"
+    minDate: "today",
+    disable: [
+      function(date) {
+        const day = date.getDay();
+        const ymd = date.toISOString().slice(0, 10);
+        const isWeekend = day === 0 || day === 6;
+        const isHoliday = holidays.includes(ymd);
+        return !(isWeekend || isHoliday);  // ❌ 禁用非假日
+      }
+    ]
   });
 }
 
-/* =======================================
-   🚀 DOM 載入後執行
-======================================= */
+
+/* ===========================
+   DOM Ready
+=========================== */
 document.addEventListener("DOMContentLoaded", () => {
   initLIFF();
   initDatePicker();
 });
 
-/* =======================================
-   📤 表單送出 → 導到 resultSend.html
-======================================= */
+
+/* ===========================
+   表單送出 → resultSend.html
+=========================== */
 document.getElementById("liffForm").addEventListener("submit", function(e) {
   e.preventDefault();
 
   const params = new URLSearchParams();
 
-  params.append("uid",   document.getElementById("line_uid").value);
+  params.append("uid", document.getElementById("line_uid").value);
   params.append("email", document.getElementById("line_email").value);
-
-  // 姓名只 append 一次就好
-  params.append("name",  document.getElementById("name").value);
-  params.append("house", document.getElementById("house").value);
-  params.append("date",  document.getElementById("date").value);
-  params.append("days",  document.getElementById("days").value);
+  params.append("name", document.getElementById("name").value);
+  params.append("phone", document.getElementById("phone").value);
+  params.append("date", document.getElementById("date").value);
+  params.append("time", document.getElementById("time").value);
   params.append("adult", document.getElementById("adult").value);
   params.append("child", document.getElementById("child").value);
-  const petValue = document.getElementById("pet").value.trim() || "無";
-  params.append("pet", petValue);
-  params.append("note",  document.getElementById("note").value);
+  params.append("chair", document.getElementById("chair").value);
+  params.append("note", document.getElementById("note").value);
+
   window.location.href = "resultSend.html?" + params.toString();
 });
 </script>
-
 
 </body>
 </html>
