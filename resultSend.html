@@ -28,9 +28,9 @@ const API_URL =
 
 (async () => {
 
-  /* --------------------------
-     1. 初始化 LIFF
-  -------------------------- */
+  /* ------------------------------------
+      1. 初始化 LIFF（必要）
+  ------------------------------------ */
   await liff.init({
     liffId: "2008586106-kLrdO1gp",
     withLoginOnExternalBrowser: false
@@ -39,50 +39,58 @@ const API_URL =
   const inClient = liff.isInClient();
   console.log("是否在 LINE APP:", inClient);
 
-  /* --------------------------
-     2. 取得 URL 參數
-  -------------------------- */
+  /* 取得使用者資訊 ————(你之前漏掉這段!!) */
+  let profile = null;
+  try {
+    profile = await liff.getProfile();
+    console.log("使用者名稱:", profile.displayName);
+  } catch (err) {
+    console.error("⚠️ 無法取得 user profile:", err);
+  }
+
+  /* ------------------------------------
+      2. 取得 URL 參數
+  ------------------------------------ */
   const url = new URL(window.location.href);
 
   const data = {
-    uid: url.searchParams.get("uid"),
+    uid:   url.searchParams.get("uid"),
     phone: url.searchParams.get("phone"),
-    date: url.searchParams.get("date"),
-    time: url.searchParams.get("time"),
+    date:  url.searchParams.get("date"),
+    time:  url.searchParams.get("time"),
     adult: url.searchParams.get("adult"),
     child: url.searchParams.get("child"),
-    seat: url.searchParams.get("seat"),
-    note: url.searchParams.get("note") || "無"
+    seat:  url.searchParams.get("seat"),
+    note:  url.searchParams.get("note") || "無"
   };
 
   console.log("送到 GAS 的 data:", data);
 
-  /* --------------------------
-     3. 寫入 Google Sheet
-  -------------------------- */
+  /* ------------------------------------
+      3. 寫入 Google Sheet
+  ------------------------------------ */
   try {
     const res = await fetch(API_URL, {
       method: "POST",
       body: JSON.stringify(data)
     });
-    console.log("GAS 狀態:", res.status);
+    console.log("GAS 回應狀態碼:", res.status);
   } catch (err) {
-    console.error("❌ 寫入試算表錯誤:", err);
+    console.error("❌ GAS 寫入錯誤:", err);
   }
 
-  /* --------------------------
-     4. 若不在 LINE -> 顯示完成頁
-  -------------------------- */
+  /* ------------------------------------
+      4. 不在 LINE → 顯示完成頁
+  ------------------------------------ */
   if (!inClient) {
     document.body.innerHTML =
       "<p>資料已送出，請在 LINE App 內開啟才能收到預約確認。</p>";
     return;
   }
 
-  /* --------------------------
-     5. Flex Message 圖卡內容
-  -------------------------- */
-
+  /* ------------------------------------
+      5. Flex Message 圖卡
+  ------------------------------------ */
   const flexMsg = {
     type: "flex",
     altText: "您的預約已送出！",
@@ -91,7 +99,7 @@ const API_URL =
       size: "mega",
       hero: {
         type: "image",
-        url: "https://i.imgur.com/RFqVg1C.png",   /* 可換成你自己的 banner */
+        url: "https://i.imgur.com/RFqVg1C.png",
         size: "full",
         aspectRatio: "16:9",
         aspectMode: "cover"
@@ -109,6 +117,13 @@ const API_URL =
             color: "#06C755"
           },
           {
+            type: "text",
+            text: `${profile ? profile.displayName : "顧客"} 您好！`,
+            size: "md",
+            weight: "bold",
+            margin: "md"
+          },
+          {
             type: "separator",
             margin: "sm"
           },
@@ -118,13 +133,13 @@ const API_URL =
             margin: "md",
             spacing: "sm",
             contents: [
-              { type: "text", text: `📅 預約日期：${data.date}`, wrap: true },
-              { type: "text", text: `⏰ 預約時段：${data.time}`, wrap: true },
-              { type: "text", text: `👨‍👩‍👧‍👦 大人：${data.adult} 位`, wrap: true },
-              { type: "text", text: `🧒 小孩：${data.child} 位`, wrap: true },
-              { type: "text", text: `🪑 兒童椅：${data.seat}`, wrap: true },
-              { type: "text", text: `📱 手機：${data.phone}`, wrap: true },
-              { type: "text", text: `📝 備註：${data.note}`, wrap: true },
+              { type: "text", text: `📅 預約日期：${data.date}` },
+              { type: "text", text: `⏰ 預約時段：${data.time}` },
+              { type: "text", text: `👨‍👩‍👧‍👦 大人：${data.adult} 位` },
+              { type: "text", text: `🧒 小孩：${data.child} 位` },
+              { type: "text", text: `🪑 兒童椅：${data.seat}` },
+              { type: "text", text: `📱 手機：${data.phone}` },
+              { type: "text", text: `📝 備註：${data.note}` }
             ]
           }
         ]
@@ -132,7 +147,6 @@ const API_URL =
       footer: {
         type: "box",
         layout: "vertical",
-        spacing: "md",
         contents: [
           {
             type: "text",
@@ -146,11 +160,12 @@ const API_URL =
     }
   };
 
-  /* --------------------------
-     6. 回傳 Flex 訊息到 LINE
-  -------------------------- */
+  /* ------------------------------------
+      6. 回傳 Flex 訊息到 LINE
+  ------------------------------------ */
   try {
     await liff.sendMessages([flexMsg]);
+    console.log("✅ Flex 訊息已成功送出！");
   } catch (e) {
     console.error("❌ Flex 回傳失敗:", e);
   }
