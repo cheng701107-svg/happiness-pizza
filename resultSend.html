@@ -80,17 +80,18 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz2looN-W2dOY9RgJN2A327
   const url = new URL(window.location.href);
 
   /* ---- 取得資料 ---- */
-  const data = {
-    uid:   url.searchParams.get("uid"),
-    name:  url.searchParams.get("name"),
-    phone: url.searchParams.get("phone"),
-    date:  url.searchParams.get("date"),
-    time:  url.searchParams.get("time"),
-    adult: url.searchParams.get("adult"),
-    child: url.searchParams.get("child") || "0",
-    seat:  url.searchParams.get("seat") || "無",
-    note:  url.searchParams.get("note") || "無",
-  };
+const data = {
+  uid: url.searchParams.get("uid"),
+  name: url.searchParams.get("name"),
+  phone: url.searchParams.get("phone"),
+  date: url.searchParams.get("date"),
+  time: url.searchParams.get("time"),
+  adult: url.searchParams.get("adult"),
+  child: url.searchParams.get("child") || "0",
+  seat: url.searchParams.get("seat") || "無",
+  note: url.searchParams.get("note") || "無"
+};
+
 
   /* ---- 製作訂單編號 ---- */
   const today = new Date();
@@ -129,59 +130,70 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz2looN-W2dOY9RgJN2A327
   if (!liff.isInClient()) return;
 
   /* ---- Flex 圖卡 ---- */
-  const flex = {
-    type: "flex",
-    altText: "預約成功",
-    contents: {
-      type: "bubble",
-      hero: {
-        type: "image",
-        url: "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_hero.png",
-        size: "full",
-        aspectRatio: "16:9",
-        aspectMode: "cover"
-      },
-      body: {
-        type: "box",
-        layout: "vertical",
-        spacing: "md",
-        contents: [
-          {
-            type: "text",
-            text: "預約成功",
-            weight: "bold",
-            size: "xl",
-            color: "#06C755"
-          },
-          {
-            type: "text",
-            text: `${data.name} 您好！`,
-            size: "md",
-            weight: "bold"
-          },
-          {
-            type: "separator",
-            margin: "md"
-          },
-          {
-            type: "box",
-            layout: "vertical",
-            margin: "md",
-            spacing: "sm",
-            contents: [
-              { type: "text", text: `📅 日期：${data.date}` },
-              { type: "text", text: `⏰ 時段：${data.time}` },
-              { type: "text", text: `👨‍👩‍👧‍👦 大人：${data.adult} 位` },
-              { type: "text", text: `🧒 小孩：${data.child} 位` },
-              { type: "text", text: `🪑 兒童椅：${data.seat}` },
-              { type: "text", text: `📱 手機：${data.phone}` },
-              { type: "text", text: `📝 備註：${data.note}` },
-            ]
-          }
-        ]
-      }
+  const flexMsg = {
+  type: "flex",
+  altText: "您的預約已送出！",
+  contents: {
+    type: "bubble",
+    size: "mega",
+    body: {
+      type: "box",
+      layout: "vertical",
+      spacing: "md",
+      paddingAll: "20px",
+      contents: [
+        {
+          type: "text",
+          text: "預約成功",
+          weight: "bold",
+          size: "xl",
+          color: "#06C755",
+          margin: "md"
+        },
+        {
+          type: "text",
+          text: `${data.name} 您好！`,
+          margin: "sm",
+          size: "md",
+          weight: "bold",
+          color: "#333333"
+        },
+        {
+          type: "separator",
+          margin: "lg"
+        },
+        {
+          type: "box",
+          layout: "vertical",
+          margin: "lg",
+          spacing: "md",
+          contents: [
+            { type: "text", text: `📅 日期：${data.date}`, wrap: true },
+            { type: "text", text: `⏰ 時段：${data.time}`, wrap: true },
+            { type: "text", text: `👨‍👩‍👧‍👦 大人：${data.adult} 位`, wrap: true },
+            { type: "text", text: `🧒 小孩：${data.child || "0"} 位`, wrap: true },
+            { type: "text", text: `🪑 兒童椅：${data.seat || "無"}`, wrap: true },
+            { type: "text", text: `📱 手機：${data.phone}`, wrap: true },
+            { type: "text", text: `📝 備註：${data.note}`, wrap: true }
+          ]
+        },
+        {
+          type: "separator",
+          margin: "lg"
+        },
+        {
+          type: "text",
+          text: "我們已收到您的預約，將盡快與您確認訂位！",
+          color: "#888888",
+          size: "sm",
+          wrap: true,
+          margin: "lg"
+        }
+      ]
     }
-  };
+  }
+};
+
 
   /* ---- 推 Flex 回 LINE ---- */
   try {
