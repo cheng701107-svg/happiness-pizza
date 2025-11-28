@@ -83,14 +83,14 @@
       </select>
     </div>
 
-    <!-- 小孩 -->
+    <!-- 小孩（0~10、非必填） -->
     <div class="field-group">
       <label>
-        小孩人數 <span class="label-required">（必填）</span>
+        小孩人數
       </label>
-      <select id="child" required>
-        <option value="" disabled selected>請選擇</option>
-          <script>
+      <select id="child">
+        <option value="" selected>0 位</option>
+        <script>
           document.write(
             Array.from({length: 10}, (_, i) => i + 1)
             .map(n => `<option value="${n}">${n} 位</option>`)
@@ -100,11 +100,11 @@
       </select>
     </div>
 
-    <!-- 兒童坐椅 -->
+    <!-- 兒童坐椅（0~5、非必填） -->
     <div class="field-group">
       <label>兒童坐椅</label>
       <select id="chair">
-       <option value="" disabled selected>請選擇</option>
+        <option value="" selected>無</option>
         <script>
           document.write(
             Array.from({length: 5}, (_, i) => i + 1)
@@ -184,9 +184,14 @@ document.getElementById("liffForm").addEventListener("submit", function(e) {
   params.append("date",  document.getElementById("date").value);
   params.append("time",  document.getElementById("time").value);
   params.append("adult", document.getElementById("adult").value);
-  params.append("child", document.getElementById("child").value);
-  params.append("chair", document.getElementById("chair").value);
-  params.append("note",  document.getElementById("note").value);
+
+  const child = document.getElementById("child").value || "0";
+  params.append("child", child);
+
+  const chair = document.getElementById("chair").value || "無";
+  params.append("chair", chair);
+
+  params.append("note", document.getElementById("note").value || "無");
 
   window.location.href = "resultSend.html?" + params.toString();
 });
