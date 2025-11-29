@@ -5,13 +5,13 @@
 <title>預約完成</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<!-- LIFF -->
+<!-- LIFF SDK -->
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
 <style>
   body {
     font-family: "Noto Sans TC", sans-serif;
-    background: #e8f5e9;
+    background: #e8f5e9; /* 淺綠背景 */
     margin: 0;
     padding: 20px;
     text-align: center;
@@ -41,8 +41,14 @@
     line-height: 1.5;
   }
 
-  .label { color: #555; }
-  .value { color: #000; font-weight: 700; }
+  .label {
+    color: #555;
+  }
+
+  .value {
+    color: #000;
+    font-weight: 700;
+  }
 
   button {
     width: 100%;
@@ -69,51 +75,62 @@
 </div>
 
 <script>
+/* ---------------------------
+  1. 初始化 + 取得資料
+---------------------------- */
 async function init() {
-
   await liff.init({ liffId: "2008586106-kLrdO1gp" });
 
   const url = new URL(window.location.href);
 
-  // ⭐ 接收並修正數據（保持純數字）
-  const url = new URL(window.location.href);
+  /* ⭐ 取資料（修正 chair → seat） */
+  const data = {
+    uid:   url.searchParams.get("uid")   || "",
+    name:  url.searchParams.get("name")  || "",
+    phone: url.searchParams.get("phone") || "",
+    date:  url.searchParams.get("date")  || "",
+    time:  url.searchParams.get("time")  || "",
+    adult: url.searchParams.get("adult") || "",
+    child: url.searchParams.get("child") || "0",
+    seat:  url.searchParams.get("chair") || "0",
+    note:  url.searchParams.get("note")  || "無",
+  };
 
-let childRaw = url.searchParams.get("child");
-let seatRaw = url.searchParams.get("chair");
+  /* ⭐ 小孩：0~10 → 給顯示「X 位」 */
+  data.child = data.child + " 位";
 
-const data = {
-  uid:   url.searchParams.get("uid")   || "",
-  name:  url.searchParams.get("name")  || "",
-  phone: url.searchParams.get("phone") || "",
-  date:  url.searchParams.get("date")  || "",
-  time:  url.searchParams.get("time")  || "",
-  adult: url.searchParams.get("adult") || "",
-  child: childRaw ? `${childRaw} 位` : "0 位",
-  seat:  seatRaw  ? `${seatRaw} 張`  : "0 張",
-  note:  url.searchParams.get("note")  || "無"
-};
+  /* ⭐ 兒童椅：0~5 → 給顯示「X 張」 */
+  data.seat = data.seat + " 張";
+
+  /* ⭐ 備註空值 → 無 */
+  if (!data.note.trim()) data.note = "無";
 
 
-  // ⭐ 處理顯示用文字
-  const childText = data.child === "0" ? "0 位" : `${data.child} 位`;
-  const seatText  = data.seat === "0" ? "0 張" : `${data.seat} 張`;
-
-  // ⭐ 渲染摘要
+  /* ---------------------------
+     2. 渲染摘要頁
+  ---------------------------- */
   document.getElementById("summary").innerHTML = `
       <div class="row"><span class="label">👤 姓名：</span><span class="value">${data.name}</span></div>
       <div class="row"><span class="label">📱 手機：</span><span class="value">${data.phone}</span></div>
       <div class="row"><span class="label">📅 預約日期：</span><span class="value">${data.date}</span></div>
       <div class="row"><span class="label">⏰ 預約時段：</span><span class="value">${data.time}</span></div>
       <div class="row"><span class="label">🧑 大人：</span><span class="value">${data.adult} 位</span></div>
-      <div class="row"><span class="label">🧒 小孩：</span><span class="value">${childText}</span></div>
-      <div class="row"><span class="label">🪑 兒童椅：</span><span class="value">${seatText}</span></div>
+      <div class="row"><span class="label">🧒 小孩：</span><span class="value">${data.child}</span></div>
+      <div class="row"><span class="label">🪑 兒童椅：</span><span class="value">${data.seat}</span></div>
       <div class="row"><span class="label">📝 備註：</span><span class="value">${data.note}</span></div>
-      <hr><div class="row" style="color:#666;font-size:16px;">我們已收到您的預約，將盡快與您確認訂位！</div>
+      <hr>
+      <div class="row" style="color:#666;font-size:16px;">
+        我們已收到您的預約，將盡快與您確認訂位！
+      </div>
   `;
 
-  // ⭐ 送出圖卡
+
+  /* ---------------------------
+     3. 按下確認 → 發送 Flex
+  ---------------------------- */
   document.getElementById("confirmBtn").addEventListener("click", async () => {
 
+    /* ⭐ Flex 內容（完全正確可送） */
     const flexMsg = {
       type: "flex",
       altText: "預約成功",
@@ -127,7 +144,6 @@ const data = {
           contents: [
             { type: "text", text: "🍽 預約成功", weight: "bold", size: "xl", color: "#06C755" },
             { type: "separator", margin: "md" },
-
             {
               type: "box",
               layout: "vertical",
@@ -138,31 +154,44 @@ const data = {
                 { type: "text", text: `📅 預約日期：${data.date}`, wrap: true },
                 { type: "text", text: `⏰ 預約時段：${data.time}`, wrap: true },
                 { type: "text", text: `🧑 大人：${data.adult} 位`, wrap: true },
-                { type: "text", text: `🧒 小孩：${childText}`, wrap: true },
-                { type: "text", text: `🪑 兒童椅：${seatText}`, wrap: true },
-                { type: "text", text: `📝 備註：${data.note}`, wrap: true },
+                { type: "text", text: `🧒 小孩：${data.child}`, wrap: true },
+                { type: "text", text: `🪑 兒童椅：${data.seat}`, wrap: true },
+                { type: "text", text: `📝 備註：${data.note}`, wrap: true }
               ]
             },
-
             { type: "separator", margin: "md" },
-
             {
               type: "text",
               text: "我們已收到您的預約，將盡快與您確認訂位！",
               size: "sm",
               color: "#666666",
-              wrap: true
+              wrap: true,
+              margin: "md"
             }
           ]
         }
       }
     };
 
+    /* ⭐ 先寫入試算表 */
+    try {
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbz2looN-W2dOY9RgJN2A327WOEs_bFfl18T1OaPvI1N7dYHPMdoLkHN9Y-3wuY4lkQm/exec",
+        {
+          method: "POST",
+          body: JSON.stringify(data)
+        }
+      );
+    } catch (err) {
+      console.error("❌ 寫入試算表錯誤：", err);
+    }
+
+    /* ⭐ 再送 Flex */
     try {
       await liff.sendMessages([flexMsg]);
       liff.closeWindow();
     } catch (err) {
-      alert("❌ 圖卡發送失敗：" + err.message);
+      alert("❌ Flex 發送失敗：" + err);
       console.error(err);
     }
   });
