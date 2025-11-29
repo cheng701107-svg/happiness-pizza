@@ -90,7 +90,7 @@ async function init() {
 
   // ⭐ 處理顯示用文字
   const childText = data.child === "0" ? "0 位" : `${data.child} 位`;
-  const seatText  = data.seat === "0" ? "無" : `${data.seat} 張`;
+  const seatText  = data.seat === "0" ? "0 張" : `${data.seat} 張`;
 
   // ⭐ 渲染摘要
   document.getElementById("summary").innerHTML = `
