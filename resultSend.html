@@ -114,47 +114,60 @@ async function init() {
   // -------------------------------------------------------
   document.getElementById("confirmBtn").addEventListener("click", async () => {
 
-    const flexMsg = {
-      type: "flex",
-      altText: "預約成功",
-      contents: {
-        type: "bubble",
-        body: {
+ const flexMsg = {
+  type: "flex",
+  altText: "預約成功",
+  contents: {
+    type: "bubble",
+    size: "mega",
+    body: {
+      type: "box",
+      layout: "vertical",
+      spacing: "md",
+      contents: [
+        {
+          type: "text",
+          text: "🍽 預約成功",
+          weight: "bold",
+          size: "xl",
+          color: "#06C755"
+        },
+        {
+          type: "separator",
+          margin: "md"
+        },
+        {
           type: "box",
           layout: "vertical",
-          spacing: "md",
+          spacing: "sm",
           contents: [
-            { type: "text", text: "🍽 預約成功", weight: "bold", size: "xl", color: "#06C755" },
-            { type: "separator", margin: "md" },
-
-            {
-              type: "box",
-              layout: "vertical",
-              spacing: "sm",
-              contents: [
-                { type: "text", text: `👤 姓名：${data.name}` },
-                { type: "text", text: `📱 手機：${data.phone}` },
-                { type: "text", text: `📅 預約日期：${data.date}` },
-                { type: "text", text: `⏰ 預約時段：${data.time}` },
-                { type: "text", text: `🧑 大人：${data.adult} 位` },
-                { type: "text", text: `🧒 小孩：${data.child}` },
-                { type: "text", text: `🪑 兒童椅：${data.seat}` },
-                { type: "text", text: `📝 備註：${data.note}` }
-              ]
-            },
-
-            { type: "separator", margin: "md" },
-            {
-              type: "text",
-              text: "我們已收到您的預約，將盡快與您確認訂位！",
-              size: "sm",
-              color: "#666",
-              wrap: true
-            }
+            { type: "text", text: `👤 姓名：${data.name}`, wrap: true },
+            { type: "text", text: `📱 手機：${data.phone}`, wrap: true },
+            { type: "text", text: `📅 預約日期：${data.date}`, wrap: true },
+            { type: "text", text: `⏰ 預約時段：${data.time}`, wrap: true },
+            { type: "text", text: `🧑 大人：${data.adult} 位`, wrap: true },
+            { type: "text", text: `🧒 小孩：${data.child}`, wrap: true },
+            { type: "text", text: `🪑 兒童椅：${data.seat}`, wrap: true },
+            { type: "text", text: `📝 備註：${data.note}`, wrap: true }
           ]
+        },
+        {
+          type: "separator",
+          margin: "md"
+        },
+        {
+          type: "text",
+          text: "我們已收到您的預約，將盡快與您確認訂位！",
+          size: "sm",
+          color: "#666666",
+          wrap: true,
+          margin: "md"
         }
-      }
-    };
+      ]
+    }
+  }
+};
+
 
     try {
       await liff.sendMessages([flexMsg]);
