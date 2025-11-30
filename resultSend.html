@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>資料送出中…</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
@@ -22,7 +22,8 @@
 <p>正在送出您的預約資料，請稍候…</p>
 
 <script>
-const API_URL = "【填入你的 GAS 網址】";
+// ⭐ 你的 GAS 網址
+const API_URL = "https://script.google.com/macros/s/AKfycbz2looN-W2dOY9RgJN2A327WOEs_bFfl18T1OaPvI1N7dYHPMdoLkHN9Y-3wuY4lkQm/exec";
 
 (async () => {
 
@@ -45,17 +46,20 @@ const API_URL = "【填入你的 GAS 網址】";
     note:  url.searchParams.get("note") || "無"
   };
 
+
   /* ---------------------------
-      1. 寫入 Google Sheet
+      1. 寫入 Google Sheet（修正版）
   ---------------------------- */
   try {
     await fetch(API_URL, {
       method: "POST",
-      body: JSON.stringify(data)
+      headers: { "Content-Type": "application/json" },   // ⭐ 必加
+      body: JSON.stringify(data)                         // ⭐ GAS 才讀得到
     });
   } catch (e) {
     console.error("❌ 試算表寫入錯誤:", e);
   }
+
 
   /* ---------------------------
       2. 若不是在 LINE
@@ -65,16 +69,17 @@ const API_URL = "【填入你的 GAS 網址】";
     return;
   }
 
+
   /* ---------------------------
-      3. 傳送文字訊息（最穩定）
+      3. 傳文字訊息（不用 Flex）
   ---------------------------- */
-  const text =
-`🍽 預約成功
+  const msg =
+`📌 您的預約已送出
 
 👤 姓名：${data.name}
 📱 手機：${data.phone}
-📅 預約日期：${data.date}
-⏰ 預約時段：${data.time}
+📅 日期：${data.date}
+⏰ 時段：${data.time}
 🧑 大人：${data.adult} 位
 🧒 小孩：${data.child} 位
 🪑 兒童椅：${data.chair} 張
@@ -84,10 +89,11 @@ const API_URL = "【填入你的 GAS 網址】";
 
   try {
     await liff.sendMessages([
-      { type: "text", text }
+      { type: "text", text: msg }
     ]);
   } catch (e) {
-    alert("❌ 傳送失敗：" + e);
+    alert("❌ 訊息發送失敗：" + e);
+    console.error(e);
   }
 
   liff.closeWindow();
