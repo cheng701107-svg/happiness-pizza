@@ -56,6 +56,10 @@ h2 {
   color: #111;
 }
 
+.field-group input::placeholder {
+  color: #aaa;
+}
+
 /* 必填紅字 */
 .label-required {
   color: #d32f2f;
