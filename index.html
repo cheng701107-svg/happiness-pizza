@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>LINE 預約訂位</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- LIFF -->
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
 <!-- 日期套件 -->
@@ -17,10 +15,8 @@
 </head>
 
 <body>
-
 <div class="container">
 
-  <!-- 顯示使用者 -->
   <div class="username">
     <span id="displayName" class="green-name"></span> 您好～
   </div>
@@ -29,37 +25,28 @@
 
   <form id="liffForm">
 
-    <!-- 隱藏 -->
-    <input type="hidden" id="line_uid">
-    <input type="hidden" id="line_email">
+    <input type="hidden" id="uid">
     <input type="hidden" id="name">
 
     <!-- 手機 -->
     <div class="field-group">
-      <label>
-        手機號碼 <span class="label-required">（必填）</span>
-      </label>
-      <input type="tel" id="phone" required placeholder="0912345678"
-             maxlength="10" pattern="09[0-9]{8}" inputmode="numeric">
+      <label>手機號碼 <span class="label-required">（必填）</span></label>
+      <input type="tel" id="phone" required maxlength="10" pattern="09[0-9]{8}">
     </div>
 
     <!-- 日期 -->
     <div class="field-group date-group">
-      <label>
-        預約日期 <span class="label-required">（必填）</span>
-      </label>
-      <input type="text" id="date" required placeholder="請選擇日期" readonly>
+      <label>預約日期 <span class="label-required">（必填）</span></label>
+      <input type="text" id="date" required readonly>
       <span class="date-icon">📅</span>
-      <div class="hint">營業日：六日與國定假日</div>
+      <div class="hint">（營業日：六日與國定假日）</div>
     </div>
 
-    <!-- 預約時段 -->
+    <!-- 時段 -->
     <div class="field-group">
-      <label>
-        預約時段 <span class="label-required">（必填）</span>
-      </label>
+      <label>預約時段 <span class="label-required">（必填）</span></label>
       <select id="time" required>
-        <option value="" disabled selected>請選擇</option>
+        <option disabled selected>請選擇</option>
         <option>11:30</option>
         <option>13:30</option>
         <option>15:30</option>
@@ -68,46 +55,44 @@
 
     <!-- 大人 -->
     <div class="field-group">
-      <label>
-        大人人數 <span class="label-required">（必填）</span>
-      </label>
+      <label>大人人數 <span class="label-required">（必填）</span></label>
       <select id="adult" required>
-        <option value="" disabled selected>請選擇</option>
+        <option disabled selected>請選擇</option>
         <script>
           document.write(
             Array.from({length: 30}, (_, i) => i + 1)
-            .map(n => `<option value="${n}">${n} 位</option>`)
-            .join("")
+              .map(n => `<option value="${n}">${n} 位</option>`)
+              .join("")
           );
         </script>
       </select>
     </div>
 
-    <!-- 小孩（0～10 / 非必填） -->
+    <!-- 小孩 -->
     <div class="field-group">
       <label>小孩人數</label>
       <select id="child">
-        <option value="" disabled selected>請選擇</option>
+        <option value="0">0 位</option>
         <script>
           document.write(
             Array.from({length: 10}, (_, i) => i + 1)
-            .map(n => `<option value="${n}">${n} 位</option>`)
-            .join("")
+              .map(n => `<option value="${n}">${n} 位</option>`)
+              .join("")
           );
         </script>
       </select>
     </div>
 
-    <!-- 兒童坐椅（0～5 / 非必填） -->
+    <!-- 椅子 -->
     <div class="field-group">
       <label>兒童坐椅</label>
       <select id="chair">
-         <option value="" disabled selected>請選擇</option>
+        <option value="0">0 張</option>
         <script>
           document.write(
             Array.from({length: 5}, (_, i) => i + 1)
-            .map(n => `<option value="${n}">${n} 張</option>`)
-            .join("")
+              .map(n => `<option value="${n}">${n} 張</option>`)
+              .join("")
           );
         </script>
       </select>
@@ -124,33 +109,21 @@
   </form>
 </div>
 
-
 <script>
-/* -------------------------
-    LIFF 初始化
--------------------------- */
 async function initLIFF() {
   await liff.init({ liffId: "2008586106-kLrdO1gp" });
 
   if (!liff.isLoggedIn()) {
-    liff.login({ redirectUri: window.location.href });
+    liff.login({ redirectUri: location.href });
     return;
   }
 
   const profile = await liff.getProfile();
-  const token = liff.getDecodedIDToken();
-
-  document.getElementById("line_uid").value = profile.userId;
-  document.getElementById("line_email").value = token?.email || "";
-  document.getElementById("name").value = profile.displayName;
-
-  // 顯示綠色姓名
   document.getElementById("displayName").innerText = profile.displayName;
+  document.getElementById("uid").value = profile.userId;
+  document.getElementById("name").value = profile.displayName;
 }
 
-/* -------------------------
-    日期選擇器
--------------------------- */
 function initDatePicker() {
   flatpickr("#date", {
     locale: "zh_tw",
@@ -159,39 +132,28 @@ function initDatePicker() {
   });
 }
 
-/* -------------------------
-   DOM ready
--------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
   initLIFF();
   initDatePicker();
 });
 
-/* -------------------------
-  表單送出 → resultSend.html
--------------------------- */
-document.getElementById("liffForm").addEventListener("submit", function(e) {
+document.getElementById("liffForm").addEventListener("submit", e => {
   e.preventDefault();
 
-  const params = new URLSearchParams();
+  const p = new URLSearchParams();
 
-  params.append("uid",   document.getElementById("line_uid").value);
-  params.append("email", document.getElementById("line_email").value);
-  params.append("name",  document.getElementById("name").value);
-  params.append("phone", document.getElementById("phone").value);
-  params.append("date",  document.getElementById("date").value);
-  params.append("time",  document.getElementById("time").value);
-  params.append("adult", document.getElementById("adult").value);
+  p.append("uid", document.getElementById("uid").value);
+  p.append("name", document.getElementById("name").value);
+  p.append("phone", document.getElementById("phone").value);
+  p.append("date", document.getElementById("date").value);
+  p.append("time", document.getElementById("time").value);
+  p.append("adult", document.getElementById("adult").value);
 
-  const child = document.getElementById("child").value || "0";
-  params.append("child", child);
+  p.append("child", document.getElementById("child").value || "0");
+  p.append("chair", document.getElementById("chair").value || "0");
+  p.append("note", document.getElementById("note").value || "無");
 
-  const chair = document.getElementById("chair").value || "無";
-  params.append("chair", chair);
-
-  params.append("note", document.getElementById("note").value || "無");
-
-  window.location.href = "resultSend.html?" + params.toString();
+  location.href = "resultSend.html?" + p.toString();
 });
 </script>
 
