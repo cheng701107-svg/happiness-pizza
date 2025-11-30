@@ -22,9 +22,11 @@
 <p>正在送出您的預約資料，請稍候…</p>
 
 <script>
+// ⭐ 你的 GAS 網址
 const API_URL = "【你的 GAS URL】";
 
 (async () => {
+
   await liff.init({
     liffId: "2008586106-kLrdO1gp",
     withLoginOnExternalBrowser: false
@@ -44,60 +46,78 @@ const API_URL = "【你的 GAS URL】";
     note:  url.searchParams.get("note") || "無"
   };
 
-  // ⭐ 寫入試算表
+  /* ---------------------------
+      1. 寫入 Google Sheet
+  ---------------------------- */
   try {
     await fetch(API_URL, {
       method: "POST",
       body: JSON.stringify(data)
     });
   } catch (e) {
-    console.error("試算表寫入錯誤:", e);
+    console.error("❌ 試算表寫入錯誤:", e);
   }
 
+  /* ---------------------------
+      2. 若不是在 LINE
+  ---------------------------- */
   if (!liff.isInClient()) {
     document.body.innerHTML = "<p>資料已送出，請回到 LINE App 查看。</p>";
     return;
   }
 
-  // ⭐ Flex 圖卡
-  const flex = {
-    type: "flex",
-    altText: "預約成功",
-    contents: {
-      type: "bubble",
-      body: {
-        type: "box",
-        layout: "vertical",
-        spacing: "md",
-        contents: [
-          { type: "text", text: "🍽 預約成功", weight: "bold", size: "xl", color: "#06C755" },
-          { type: "separator", margin: "md" },
-          { type: "text", text: `👤 姓名：${data.name}` },
-          { type: "text", text: `📱 手機：${data.phone}` },
-          { type: "text", text: `📅 預約日期：${data.date}` },
-          { type: "text", text: `⏰ 預約時段：${data.time}` },
-          { type: "text", text: `🧑 大人：${data.adult} 位` },
-          { type: "text", text: `🧒 小孩：${data.child} 位` },
-          { type: "text", text: `🪑 兒童椅：${data.chair} 張` },
-          { type: "text", text: `📝 備註：${data.note}` },
-          { type: "separator", margin: "md" },
-          { type: "text",
-            text: "我們已收到您的預約，將盡快與您確認訂位！",
-            size: "sm",
-            color: "#666",
-            wrap: true }
-        ]
-      }
+  /* ---------------------------
+      3. Flex Bubble（正確格式）
+  ---------------------------- */
+  const bubble = {
+    type: "bubble",
+    body: {
+      type: "box",
+      layout: "vertical",
+      spacing: "md",
+      contents: [
+        { type: "text", text: "🍽 預約成功", weight: "bold", size: "xl", color: "#06C755" },
+        { type: "separator", margin: "md" },
+
+        { type: "text", text: `👤 姓名：${data.name}`, wrap: true },
+        { type: "text", text: `📱 手機：${data.phone}`, wrap: true },
+        { type: "text", text: `📅 預約日期：${data.date}`, wrap: true },
+        { type: "text", text: `⏰ 預約時段：${data.time}`, wrap: true },
+        { type: "text", text: `🧑 大人：${data.adult} 位`, wrap: true },
+        { type: "text", text: `🧒 小孩：${data.child} 位`, wrap: true },
+        { type: "text", text: `🪑 兒童椅：${data.chair} 張`, wrap: true },
+        { type: "text", text: `📝 備註：${data.note}`, wrap: true },
+
+        { type: "separator", margin: "md" },
+        {
+          type: "text",
+          text: "我們已收到您的預約，將盡快與您確認訂位！",
+          size: "sm",
+          color: "#666",
+          wrap: true
+        }
+      ]
     }
   };
 
+  /* ---------------------------
+      4. 正確 sendMessages()
+  ---------------------------- */
   try {
-    await liff.sendMessages([flex]);
+    await liff.sendMessages([
+      {
+        type: "flex",
+        altText: "預約成功",
+        contents: bubble   // ⭐ 這裡不能再包一層！
+      }
+    ]);
   } catch (e) {
-    alert("Flex 發送失敗：" + e);
+    alert("❌ Flex 發送失敗：" + e);
+    console.error(e);
   }
 
   liff.closeWindow();
+
 })();
 </script>
 
