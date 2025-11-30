@@ -23,11 +23,18 @@
 
   <h2>請填寫預約資訊</h2>
 
+  <!-- 姓名（必填，使用者自行輸入） -->
+<div class="field-group">
+  <label>
+    姓名 <span class="label-required">（必填）</span>
+  </label>
+  <input type="text" id="name" required placeholder="請輸入姓名">
+</div>
+
   <form id="liffForm">
 
     <input type="hidden" id="uid">
-    <input type="hidden" id="name">
-
+ 
     <!-- 手機 -->
     <div class="field-group">
       <label>手機號碼 <span class="label-required">（必填）</span></label>
@@ -114,15 +121,21 @@ async function initLIFF() {
   await liff.init({ liffId: "2008586106-kLrdO1gp" });
 
   if (!liff.isLoggedIn()) {
-    liff.login({ redirectUri: location.href });
+    liff.login({ redirectUri: window.location.href });
     return;
   }
 
   const profile = await liff.getProfile();
+  const token = liff.getDecodedIDToken();
+
+  // 記錄 userId / email
+  document.getElementById("line_uid").value = profile.userId;
+  document.getElementById("line_email").value = token?.email || "";
+
+  // 不再自動填姓名，只顯示打招呼
   document.getElementById("displayName").innerText = profile.displayName;
-  document.getElementById("uid").value = profile.userId;
-  document.getElementById("name").value = profile.displayName;
 }
+
 
 function initDatePicker() {
   flatpickr("#date", {
