@@ -5,7 +5,6 @@
 <title>資料送出中…</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- LIFF -->
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
 <style>
@@ -20,131 +19,85 @@
 </head>
 
 <body>
-<p id="msg">正在為您送出預約資訊…</p>
+<p>正在送出您的預約資料，請稍候…</p>
 
 <script>
-const API_URL =
-  "https://script.google.com/macros/s/AKfycbz2looN-W2dOY9RgJN2A327WOEs_bFfl18T1OaPvI1N7dYHPMdoLkHN9Y-3wuY4lkQm/exec";
+const API_URL = "【你的 GAS URL】";
 
-// -----------------------------
-// 🚀 立即執行
-// -----------------------------
 (async () => {
-
   await liff.init({
     liffId: "2008586106-kLrdO1gp",
     withLoginOnExternalBrowser: false
   });
 
-  const inClient = liff.isInClient();
+  const url = new URL(location.href);
 
-  const url = new URL(window.location.href);
-
-  // ⭐ 正確接收所有欄位
-  let data = {
-    uid:   url.searchParams.get("uid")   || "",
-    name:  url.searchParams.get("name")  || "",
-    phone: url.searchParams.get("phone") || "",
-    date:  url.searchParams.get("date")  || "",
-    time:  url.searchParams.get("time")  || "",
-    adult: url.searchParams.get("adult") || "",
+  const data = {
+    uid:   url.searchParams.get("uid"),
+    name:  url.searchParams.get("name"),
+    phone: url.searchParams.get("phone"),
+    date:  url.searchParams.get("date"),
+    time:  url.searchParams.get("time"),
+    adult: url.searchParams.get("adult"),
     child: url.searchParams.get("child") || "0",
-    seat:  url.searchParams.get("chair") || "無",
-    note:  url.searchParams.get("note")  || "無"
+    chair: url.searchParams.get("chair") || "0",
+    note:  url.searchParams.get("note") || "無"
   };
 
-  // ⭐ 格式修正
-  data.child = data.child === "" ? "0" : data.child;
-  data.seat  = data.seat === "" ? "無" : data.seat;
-  data.note  = data.note === "" ? "無" : data.note;
-
-  // -----------------------------
-  // ✨ 寫入試算表
-  // -----------------------------
+  // ⭐ 寫入試算表
   try {
     await fetch(API_URL, {
       method: "POST",
       body: JSON.stringify(data)
     });
-  } catch (err) {
-    document.getElementById("msg").innerText = "❌ 試算表寫入失敗";
-    console.error(err);
+  } catch (e) {
+    console.error("試算表寫入錯誤:", e);
   }
 
-  // -----------------------------
-  // ❗ 若不在 LINE → 結束
-  // -----------------------------
-  if (!inClient) {
-    document.getElementById("msg").innerHTML =
-      "資料已送出，請回到 LINE 以收到確認訊息。";
+  if (!liff.isInClient()) {
+    document.body.innerHTML = "<p>資料已送出，請回到 LINE App 查看。</p>";
     return;
   }
 
-  // -----------------------------
-  // 🎨 Flex 卡片（完全合法版本）
-  // -----------------------------
-  const flexMsg = {
+  // ⭐ Flex 圖卡
+  const flex = {
     type: "flex",
     altText: "預約成功",
     contents: {
       type: "bubble",
-      size: "mega",
       body: {
         type: "box",
         layout: "vertical",
         spacing: "md",
         contents: [
-          {
-            type: "text",
-            text: "🍽 預約成功",
-            weight: "bold",
-            size: "xl",
-            color: "#06C755"
-          },
+          { type: "text", text: "🍽 預約成功", weight: "bold", size: "xl", color: "#06C755" },
           { type: "separator", margin: "md" },
-
-          // 資訊內容
-          {
-            type: "box",
-            layout: "vertical",
-            spacing: "sm",
-            contents: [
-              { type: "text", text: `👤 姓名：${data.name}`, wrap: true },
-              { type: "text", text: `📱 手機：${data.phone}`, wrap: true },
-              { type: "text", text: `📅 預約日期：${data.date}`, wrap: true },
-              { type: "text", text: `⏰ 預約時段：${data.time}`, wrap: true },
-              { type: "text", text: `🧑 大人：${data.adult} 位`, wrap: true },
-              { type: "text", text: `🧒 小孩：${data.child} 位`, wrap: true },
-              { type: "text", text: `🪑 兒童椅：${data.seat} 張`, wrap: true },
-              { type: "text", text: `📝 備註：${data.note}`, wrap: true }
-            ]
-          },
-
+          { type: "text", text: `👤 姓名：${data.name}` },
+          { type: "text", text: `📱 手機：${data.phone}` },
+          { type: "text", text: `📅 預約日期：${data.date}` },
+          { type: "text", text: `⏰ 預約時段：${data.time}` },
+          { type: "text", text: `🧑 大人：${data.adult} 位` },
+          { type: "text", text: `🧒 小孩：${data.child} 位` },
+          { type: "text", text: `🪑 兒童椅：${data.chair} 張` },
+          { type: "text", text: `📝 備註：${data.note}` },
           { type: "separator", margin: "md" },
-
-          {
-            type: "text",
+          { type: "text",
             text: "我們已收到您的預約，將盡快與您確認訂位！",
             size: "sm",
             color: "#666",
-            wrap: true
-          }
+            wrap: true }
         ]
       }
     }
   };
 
-  // -----------------------------
-  // 🚀 傳送 Flex 給 LINE
-  // -----------------------------
   try {
-    await liff.sendMessages([flexMsg]);
-    liff.closeWindow();
-  } catch (err) {
-    document.getElementById("msg").innerHTML =
-      "❌ 圖卡發送失敗（格式錯誤）";
-    console.error("Flex 錯誤：", err);
+    await liff.sendMessages([flex]);
+  } catch (e) {
+    alert("Flex 發送失敗：" + e);
   }
+
+  liff.closeWindow();
 })();
 </script>
 
