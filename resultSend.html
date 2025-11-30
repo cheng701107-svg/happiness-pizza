@@ -51,11 +51,11 @@ const API_URL = "https://script.google.com/macros/s/AKfycbzOTOJTDCJNjTW-j_QAzTBQ
       1. 寫入 Google Sheet（修正版）
   ---------------------------- */
   try {
-    await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },   // ⭐ 必加
-      body: JSON.stringify(data)                         // ⭐ GAS 才讀得到
-    });
+   await fetch(API_URL, {
+  method: "POST",
+  body: JSON.stringify(data)
+});
+
   } catch (e) {
     console.error("❌ 試算表寫入錯誤:", e);
   }
