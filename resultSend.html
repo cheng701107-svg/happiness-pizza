@@ -22,7 +22,7 @@
 <p>正在送出您的預約資料，請稍候…</p>
 
 <script>
-// ⭐ 你的 GAS 網址
+// ⭐ 你的 GAS 網址（請替換）
 const API_URL = "【你的 GAS URL】";
 
 (async () => {
@@ -34,6 +34,7 @@ const API_URL = "【你的 GAS URL】";
 
   const url = new URL(location.href);
 
+  // 取得 URL 參數
   const data = {
     uid:   url.searchParams.get("uid"),
     name:  url.searchParams.get("name"),
@@ -47,7 +48,7 @@ const API_URL = "【你的 GAS URL】";
   };
 
   /* ---------------------------
-      1. 寫入 Google Sheet
+      1️⃣ 寫入 Google Sheet
   ---------------------------- */
   try {
     await fetch(API_URL, {
@@ -59,7 +60,7 @@ const API_URL = "【你的 GAS URL】";
   }
 
   /* ---------------------------
-      2. 若不是在 LINE
+      2️⃣ 非 LINE APP 情況
   ---------------------------- */
   if (!liff.isInClient()) {
     document.body.innerHTML = "<p>資料已送出，請回到 LINE App 查看。</p>";
@@ -67,57 +68,38 @@ const API_URL = "【你的 GAS URL】";
   }
 
   /* ---------------------------
-      3. Flex Bubble（正確格式）
+      3️⃣ 組合「純文字訊息」
   ---------------------------- */
-  const bubble = {
-    type: "bubble",
-    body: {
-      type: "box",
-      layout: "vertical",
-      spacing: "md",
-      contents: [
-        { type: "text", text: "🍽 預約成功", weight: "bold", size: "xl", color: "#06C755" },
-        { type: "separator", margin: "md" },
-
-        { type: "text", text: `👤 姓名：${data.name}`, wrap: true },
-        { type: "text", text: `📱 手機：${data.phone}`, wrap: true },
-        { type: "text", text: `📅 預約日期：${data.date}`, wrap: true },
-        { type: "text", text: `⏰ 預約時段：${data.time}`, wrap: true },
-        { type: "text", text: `🧑 大人：${data.adult} 位`, wrap: true },
-        { type: "text", text: `🧒 小孩：${data.child} 位`, wrap: true },
-        { type: "text", text: `🪑 兒童椅：${data.chair} 張`, wrap: true },
-        { type: "text", text: `📝 備註：${data.note}`, wrap: true },
-
-        { type: "separator", margin: "md" },
-        {
-          type: "text",
-          text: "我們已收到您的預約，將盡快與您確認訂位！",
-          size: "sm",
-          color: "#666",
-          wrap: true
-        }
-      ]
-    }
-  };
+  const textMsg =
+`🍽 *預約成功*
+————————————
+👤 姓名：${data.name}
+📱 手機：${data.phone}
+📅 預約日期：${data.date}
+⏰ 預約時段：${data.time}
+🧑 大人：${data.adult} 位
+🧒 小孩：${data.child} 位
+🪑 兒童椅：${data.chair} 張
+📝 備註：${data.note}
+————————————
+我們已收到您的預約，將盡快與您確認訂位！`;
 
   /* ---------------------------
-      4. 正確 sendMessages()
+      4️⃣ 傳送純文字訊息（100% 不會錯）
   ---------------------------- */
   try {
     await liff.sendMessages([
       {
-        type: "flex",
-        altText: "預約成功",
-        contents: bubble   // ⭐ 這裡不能再包一層！
+        type: "text",
+        text: textMsg
       }
     ]);
   } catch (e) {
-    alert("❌ Flex 發送失敗：" + e);
+    alert("❌ 訊息發送失敗：" + e);
     console.error(e);
   }
 
   liff.closeWindow();
-
 })();
 </script>
 
