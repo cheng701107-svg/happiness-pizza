@@ -30,20 +30,20 @@
 
     <!-- 姓名 -->
     <div class="field-group">
-      <label>姓名 <span class="label-required">（必填）</span></label>
+      <label>姓名 <span class="label-required">*</span></label>
       <input type="text" id="name" required placeholder="請輸入姓名">
     </div>
 
     <!-- 手機 -->
     <div class="field-group">
-      <label>手機號碼 <span class="label-required">（必填）</span></label>
+      <label>手機號碼 <span class="label-required">*</span></label>
       <input type="tel" id="phone" required maxlength="10" placeholder="0912345678"
              pattern="09[0-9]{8}" inputmode="numeric">
     </div>
 
     <!-- 日期 -->
     <div class="field-group date-group">
-      <label>預約日期 <span class="label-required">（必填）</span></label>
+      <label>預約日期 <span class="label-required">*</span></label>
       <input type="text" id="date" required placeholder="請選擇日期" readonly>
       <span class="date-icon">📅</span>
       <div class="hint">營業日為六日與國定假日</div>
@@ -51,7 +51,7 @@
 
     <!-- 時段 -->
     <div class="field-group">
-      <label>預約時段 <span class="label-required">（必填）</span></label>
+      <label>預約時段 <span class="label-required">*</span></label>
       <select id="time" required>
         <option value="" disabled selected>請選擇</option>
         <option>11:30</option>
@@ -62,7 +62,7 @@
 
     <!-- 大人 -->
     <div class="field-group">
-      <label>大人人數 <span class="label-required">（必填）</span></label>
+      <label>大人人數 <span class="label-required">*</span></label>
       <select id="adult" required>
         <option value="" disabled selected>請選擇</option>
         <script>
